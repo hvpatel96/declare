@@ -1,20 +1,24 @@
 let players = [];
-let scores = []; // Array of arrays: [[P1_R1, P2_R1], [P1_R2, P2_R2], ...]
+let scores = [];
+let isGameOver = false; // NEW STATE VARIABLE
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // No data loading necessary, we just render the empty board.
+    // Note: If you were using persistence, you would load the isGameOver state here.
     renderScoreboard();
 });
 
 // --- PLAYER MANAGEMENT ---
 window.addPlayer = function() {
+    if (isGameOver) {
+        alert("Game over! Please start a new game to add players.");
+        return;
+    }
     const input = document.getElementById('playerNameInput');
     const name = input.value.trim();
     if (name && !players.includes(name)) {
         players.push(name);
         input.value = '';
-        // No saveGameData() call needed
         renderScoreboard();
     } else if (name) {
         alert("Player name already exists or is invalid.");
@@ -25,7 +29,7 @@ window.clearScores = function() {
     if (confirm("Are you sure you want to start a new game? This will clear ALL players and scores.")) {
         players = [];
         scores = [];
-        // No saveGameData() call needed
+        isGameOver = false; // Reset game state
         renderScoreboard();
         // Clear inputs after reset
         document.getElementById('playerNameInput').value = '';
@@ -35,6 +39,11 @@ window.clearScores = function() {
 
 // --- SCORE LOGIC ---
 window.addRoundScores = function() {
+    if (isGameOver) {
+        alert("The game has ended. Start a new game to enter scores.");
+        return;
+    }
+    
     const roundScores = [];
     let allValid = true;
 
@@ -51,7 +60,6 @@ window.addRoundScores = function() {
 
     if (allValid) {
         scores.push(roundScores);
-        // No saveGameData() call needed
         renderScoreboard();
         // Reset the score inputs to zero after submission
         players.forEach((player, index) => {
@@ -59,6 +67,23 @@ window.addRoundScores = function() {
         });
     }
 }
+
+// NEW FUNCTION: End Game
+window.endGame = function() {
+    if (players.length === 0) {
+        alert("You must add players before ending the game.");
+        return;
+    }
+    if (scores.length === 0) {
+        alert("At least one round must be played before ending the game.");
+        return;
+    }
+    if (confirm("Are you sure you want to end the game? Scores will be finalized and no more rounds can be added.")) {
+        isGameOver = true;
+        renderScoreboard();
+    }
+}
+
 
 // --- RENDERING ---
 function renderScoreboard() {
@@ -68,6 +93,7 @@ function renderScoreboard() {
     const tfoot = document.getElementById('totalRow');
     const scoreEntryDiv = document.getElementById('scoreEntry');
     const scoreInputsDiv = document.getElementById('playerScoreInputs');
+    const endGameButton = document.getElementById('endGameButton'); // Get the new button
     
     // Clear existing rows/columns
     thead.innerHTML = '<th>Round</th>';
@@ -75,12 +101,16 @@ function renderScoreboard() {
     tfoot.innerHTML = '<td>Total</td>';
     scoreInputsDiv.innerHTML = '';
     
-    if (players.length === 0) {
+    // Hide/Show score entry based on game state
+    if (players.length === 0 || isGameOver) {
         scoreEntryDiv.style.display = 'none';
-        return;
+        endGameButton.style.display = 'none';
+    } else {
+        scoreEntryDiv.style.display = 'block';
+        endGameButton.style.display = 'inline-block';
     }
-    
-    scoreEntryDiv.style.display = 'block';
+
+    if (players.length === 0) return;
 
     let totals = new Array(players.length).fill(0);
 
@@ -90,19 +120,20 @@ function renderScoreboard() {
         th.textContent = player;
         thead.appendChild(th);
         
-        // Create score input fields for the next round
-        scoreInputsDiv.innerHTML += `
-            <div>
-                <label>${player}:</label>
-                <input type="number" id="score-input-${index}" min="0" value="0">
-            </div>
-        `;
+        // Only create input fields if the game is NOT over
+        if (!isGameOver) {
+            scoreInputsDiv.innerHTML += `
+                <div>
+                    <label>${player}:</label>
+                    <input type="number" id="score-input-${index}" min="0" value="0">
+                </div>
+            `;
+        }
     });
 
-    // 2. Render Score Rows
+    // 2. Render Score Rows (Unchanged)
     scores.forEach((roundScores, roundIndex) => {
         const tr = document.createElement('tr');
-        // Round Number
         tr.innerHTML += `<td>${roundIndex + 1}</td>`;
 
         roundScores.forEach((score, playerIndex) => {
@@ -112,9 +143,8 @@ function renderScoreboard() {
         tbody.appendChild(tr);
     });
 
-    // 3. Render Totals Row
+    // 3. Render Totals Row & Highlight
     let lowestTotal = Infinity;
-    // Find the lowest total
     totals.forEach(total => {
         if (total < lowestTotal) {
             lowestTotal = total;
@@ -124,9 +154,15 @@ function renderScoreboard() {
     totals.forEach(total => {
         const td = document.createElement('td');
         td.textContent = total;
-        // Highlight the overall winner(s)
-        if (total === lowestTotal && lowestTotal !== 0) {
+        
+        // Only highlight the winner if the game is over
+        if (isGameOver && total === lowestTotal) {
             td.classList.add('winner');
+        } else if (!isGameOver) {
+             // In-game highlight (Optional: keep or remove)
+             if (total === lowestTotal && lowestTotal !== 0) {
+                 td.classList.add('winner');
+             }
         }
         tfoot.appendChild(td);
     });
