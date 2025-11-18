@@ -155,3 +155,10 @@ button:hover {
         font-size: 0.9em;
     }
 }
+
+/* --- Loser Highlight (Highest Total/Trailing Player) --- */
+.loser {
+    background-color: #f5b7b1 !important; /* Soft, muted red */
+    color: #8c0000;
+    font-weight: 800 !important;
+}
