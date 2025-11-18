@@ -91,7 +91,7 @@ button:hover {
 
 #scoreTable tfoot td {
     font-weight: bold;
-    background-color: #ecf0f1; /* Soft green for totals */
+    background-color: #d1f7e8; /* Soft green for totals */
     color: #004d40;
     border-top: 2px solid #3498db;
     font-size: 1.1em;
@@ -123,15 +123,8 @@ button:hover {
 
 /* Winner Highlight (Lowest Total) */
 .winner {
-    background-color: #4CAF50 !important; /* Green for Winner */
+    background-color: #f1c40f !important; /* Brighter gold/yellow */
     color: #1a1a1a;
-    font-weight: 800 !important;
-}
-
-/* --- Loser Highlight (Highest Total/Trailing Player) --- */
-.loser {
-    background-color: #f5b7b1 !important; /* Soft, muted red */
-    color: #8c0000;
     font-weight: 800 !important;
 }
 
