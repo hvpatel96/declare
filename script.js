@@ -1,10 +1,9 @@
 let players = [];
 let scores = [];
-let isGameOver = false; // NEW STATE VARIABLE
+let isGameOver = false;
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    // Note: If you were using persistence, you would load the isGameOver state here.
     renderScoreboard();
 });
 
@@ -31,7 +30,6 @@ window.clearScores = function() {
         scores = [];
         isGameOver = false; // Reset game state
         renderScoreboard();
-        // Clear inputs after reset
         document.getElementById('playerNameInput').value = '';
         document.getElementById('playerScoreInputs').innerHTML = '';
     }
@@ -61,14 +59,13 @@ window.addRoundScores = function() {
     if (allValid) {
         scores.push(roundScores);
         renderScoreboard();
-        // Reset the score inputs to zero after submission
         players.forEach((player, index) => {
             document.getElementById(`score-input-${index}`).value = 0;
         });
     }
 }
 
-// NEW FUNCTION: End Game
+// END GAME FUNCTION
 window.endGame = function() {
     if (players.length === 0) {
         alert("You must add players before ending the game.");
@@ -93,7 +90,7 @@ function renderScoreboard() {
     const tfoot = document.getElementById('totalRow');
     const scoreEntryDiv = document.getElementById('scoreEntry');
     const scoreInputsDiv = document.getElementById('playerScoreInputs');
-    const endGameButton = document.getElementById('endGameButton'); // Get the new button
+    const endGameButton = document.getElementById('endGameButton');
     
     // Clear existing rows/columns
     thead.innerHTML = '<th>Round</th>';
@@ -114,13 +111,12 @@ function renderScoreboard() {
 
     let totals = new Array(players.length).fill(0);
 
-    // 1. Render Header (Player Names)
+    // 1. Render Header and Inputs
     players.forEach((player, index) => {
         const th = document.createElement('th');
         th.textContent = player;
         thead.appendChild(th);
         
-        // Only create input fields if the game is NOT over
         if (!isGameOver) {
             scoreInputsDiv.innerHTML += `
                 <div>
@@ -131,7 +127,7 @@ function renderScoreboard() {
         }
     });
 
-    // 2. Render Score Rows (Unchanged)
+    // 2. Render Score Rows
     scores.forEach((roundScores, roundIndex) => {
         const tr = document.createElement('tr');
         tr.innerHTML += `<td>${roundIndex + 1}</td>`;
@@ -143,27 +139,32 @@ function renderScoreboard() {
         tbody.appendChild(tr);
     });
 
-    // 3. Render Totals Row & Highlight
+    // 3. Render Totals Row & Highlight Logic (REVISED)
     let lowestTotal = Infinity;
+    let highestTotal = -1; // Initialize for finding the highest score
+
+    // Find the min and max totals
     totals.forEach(total => {
-        if (total < lowestTotal) {
-            lowestTotal = total;
-        }
+        if (total < lowestTotal) lowestTotal = total;
+        if (total > highestTotal) highestTotal = total;
     });
 
+    // Apply colors
     totals.forEach(total => {
         const td = document.createElement('td');
         td.textContent = total;
         
-        // Only highlight the winner if the game is over
-        if (isGameOver && total === lowestTotal) {
+        // Always highlight the lowest total (current leader) if scores exist
+        if (scores.length > 0 && total === lowestTotal) {
             td.classList.add('winner');
-        } else if (!isGameOver) {
-             // In-game highlight (Optional: keep or remove)
-             if (total === lowestTotal && lowestTotal !== 0) {
-                 td.classList.add('winner');
-             }
         }
+        
+        // Highlight the highest total (current loser)
+        // Only apply if the highest score is NOT the same as the lowest score
+        if (scores.length > 0 && total === highestTotal && highestTotal !== lowestTotal) {
+            td.classList.add('loser');
+        }
+
         tfoot.appendChild(td);
     });
     
