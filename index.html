@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Declare Scorebook</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Declare: Game Scorebook</h1>
+
+    <div class="player-entry">
+        <h2>Add Players</h2>
+        <input type="text" id="playerNameInput" placeholder="Player Name">
+        <button onclick="addPlayer()">Add Player</button>
+        <button onclick="clearScores()" class="clear-btn">Start New Game / Clear Scores</button>
+    </div>
+
+    <div class="scoreboard-container">
+        <h2>Scoreboard</h2>
+        <table id="scoreTable">
+            <thead>
+                <tr>
+                    <th>Round</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+            <tfoot>
+                <tr id="totalRow">
+                    <td>Total</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div id="scoreEntry" style="display: none;">
+            <h3>Round Score Entry (<span id="currentRound">1</span>)</h3>
+            <div id="playerScoreInputs">
+                </div>
+            <button onclick="addRoundScores()">Add Round Scores</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
