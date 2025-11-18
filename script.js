@@ -1,26 +1,11 @@
 let players = [];
 let scores = []; // Array of arrays: [[P1_R1, P2_R1], [P1_R2, P2_R2], ...]
-const SCORE_KEY = 'declareScorebookData';
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    loadGameData();
+    // No data loading necessary, we just render the empty board.
     renderScoreboard();
 });
-
-function loadGameData() {
-    const savedData = localStorage.getItem(SCORE_KEY);
-    if (savedData) {
-        const data = JSON.parse(savedData);
-        players = data.players || [];
-        scores = data.scores || [];
-    }
-}
-
-function saveGameData() {
-    const data = { players, scores };
-    localStorage.setItem(SCORE_KEY, JSON.stringify(data));
-}
 
 // --- PLAYER MANAGEMENT ---
 window.addPlayer = function() {
@@ -29,7 +14,7 @@ window.addPlayer = function() {
     if (name && !players.includes(name)) {
         players.push(name);
         input.value = '';
-        saveGameData();
+        // No saveGameData() call needed
         renderScoreboard();
     } else if (name) {
         alert("Player name already exists or is invalid.");
@@ -40,8 +25,11 @@ window.clearScores = function() {
     if (confirm("Are you sure you want to start a new game? This will clear ALL players and scores.")) {
         players = [];
         scores = [];
-        saveGameData();
+        // No saveGameData() call needed
         renderScoreboard();
+        // Clear inputs after reset
+        document.getElementById('playerNameInput').value = '';
+        document.getElementById('playerScoreInputs').innerHTML = '';
     }
 }
 
@@ -63,8 +51,12 @@ window.addRoundScores = function() {
 
     if (allValid) {
         scores.push(roundScores);
-        saveGameData();
+        // No saveGameData() call needed
         renderScoreboard();
+        // Reset the score inputs to zero after submission
+        players.forEach((player, index) => {
+            document.getElementById(`score-input-${index}`).value = 0;
+        });
     }
 }
 
@@ -122,6 +114,7 @@ function renderScoreboard() {
 
     // 3. Render Totals Row
     let lowestTotal = Infinity;
+    // Find the lowest total
     totals.forEach(total => {
         if (total < lowestTotal) {
             lowestTotal = total;
@@ -131,7 +124,8 @@ function renderScoreboard() {
     totals.forEach(total => {
         const td = document.createElement('td');
         td.textContent = total;
-        if (total === lowestTotal) {
+        // Highlight the overall winner(s)
+        if (total === lowestTotal && lowestTotal !== 0) {
             td.classList.add('winner');
         }
         tfoot.appendChild(td);
