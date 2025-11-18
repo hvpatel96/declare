@@ -91,7 +91,7 @@ button:hover {
 
 #scoreTable tfoot td {
     font-weight: bold;
-    background-color: #d1f7e8; /* Soft green for totals */
+    background-color: #ecf0f1; /* Soft green for totals */
     color: #004d40;
     border-top: 2px solid #3498db;
     font-size: 1.1em;
@@ -123,7 +123,7 @@ button:hover {
 
 /* Winner Highlight (Lowest Total) */
 .winner {
-    background-color: #f1c40f !important; /* Brighter gold/yellow */
+    background-color: #4CAF50 !important; /* Green for Winner */
     color: #1a1a1a;
     font-weight: 800 !important;
 }
